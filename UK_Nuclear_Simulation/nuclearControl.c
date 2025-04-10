@@ -114,7 +114,7 @@ void *handle_client(void *arg) {
             continue;
         }
         
-        if (verify_message(&msg, control_key) {
+        if (verify_message(&msg, control_key)) {
             decrypt_message(&msg, control_key);
             process_message(client_socket, &msg);
         } else {

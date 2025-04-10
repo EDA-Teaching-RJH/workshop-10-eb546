@@ -10,6 +10,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <sys/select.h>  // Added for fd_set and timeval
 #include <openssl/evp.h>
 #include <openssl/rand.h>
 #include <openssl/err.h>

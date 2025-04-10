@@ -4,48 +4,70 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h> // For timestamps
+#include <unistd.h>
+#include <time.h>
+#include <stdbool.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <openssl/evp.h>
+#include <openssl/rand.h>
+#include <openssl/err.h>
+#include <pthread.h>
 
-// --- Configuration ---
-#define SERVER_IP "127.0.0.1" // Loopback for local testing
-#define SERVER_PORT 65000
-#define MAX_CLIENTS 5
+#define CONTROL_PORT 8080
+#define MAX_CLIENTS 10
 #define BUFFER_SIZE 1024
-#define LOG_DIR "logs"
+#define KEY_SIZE 32
+#define IV_SIZE 16
+#define MAX_TARGETS 100
+#define LOG_FILE "nuclear_log.txt"
 
-// --- Shared Secret Key (HIGHLY INSECURE - FOR DEMO ONLY) ---
-#define SHARED_SECRET_KEY "TridentIsGoMaybe?" // Replace with something complex in a real (non-demo) scenario
+// Message types
+typedef enum {
+    MSG_REGISTER,
+    MSG_INTEL,
+    MSG_LAUNCH_ORDER,
+    MSG_LAUNCH_CONFIRM,
+    MSG_STATUS,
+    MSG_ERROR,
+    MSG_TEST
+} MessageType;
 
-// --- Message Tags/Types ---
-#define MSG_TYPE_SEP ':'
-#define MSG_END '\n' // Use newline as message terminator
+// Intel categories
+typedef enum {
+    INTEL_RADAR,
+    INTEL_SATELLITE,
+    INTEL_SUBMARINE
+} IntelType;
 
-// Client -> Server
-#define TAG_IDENTIFY "IDENTIFY" // Payload: SILO | SUB | RADAR | SAT
-#define TAG_INTEL "INTEL"       // Payload: <Source>:<Data>
-#define TAG_STATUS "STATUS"     // Payload: <Source>:OK | READY | LAUNCHED | ERROR <details>
-#define TAG_LAUNCH_ACK "LAUNCH_ACK" // Payload: <Source>:SUCCESS | FAILURE <reason>
+// Target information
+typedef struct {
+    char name[50];
+    double latitude;
+    double longitude;
+    int priority;
+} Target;
 
-// Server -> Client (Especially Silo/Sub)
-#define TAG_COMMAND "CMD" // Payload: <CommandType>:<Data>:<Checksum>
-#define CMD_LAUNCH "LAUNCH" // Data: <TargetInfo>
-#define CMD_STANDDOWN "STANDDOWN" // Data: <Reason>
-#define CMD_QUERY_STATUS "QUERY_STATUS" // Data: -
+// Message structure
+typedef struct {
+    MessageType type;
+    char sender[20];
+    char payload[BUFFER_SIZE - sizeof(MessageType) - sizeof(char[20])];
+    unsigned char iv[IV_SIZE];
+    unsigned char mac[EVP_MAX_MD_SIZE];
+    int mac_len;
+} SecureMessage;
 
-// Client Identifiers (used in IDENTIFY and subsequent messages)
-#define ID_SILO "SILO"
-#define ID_SUB "SUBMARINE"
-#define ID_RADAR "RADAR"
-#define ID_SAT "SATELLITE"
-#define ID_CONTROL "CONTROL" // For logging from control itself
-
-// --- Function Prototypes (from utils.c) ---
-void log_message(const char *source_id, const char *format, ...); // <<< MUST HAVE ...
-void encrypt_decrypt_xor(char *data, size_t len, const char *key);
-unsigned long simple_checksum(const char *data, const char *key);
-
-// --- Utility Macros ---
-#define UNUSED(x) (void)(x) // Suppress unused parameter warnings
+// Function prototypes
+void handle_error(const char *msg, bool fatal);
+void init_crypto();
+void cleanup_crypto();
+int encrypt_message(SecureMessage *msg, const unsigned char *key);
+int decrypt_message(SecureMessage *msg, const unsigned char *key);
+int verify_message(SecureMessage *msg, const unsigned char *key);
+void generate_random_key(unsigned char *key, int size);
+void log_message(const char *message);
+void print_hex(const char *label, const unsigned char *data, int len);
 
 #endif // COMMON_H
-

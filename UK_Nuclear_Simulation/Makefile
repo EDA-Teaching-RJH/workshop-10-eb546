@@ -4,20 +4,20 @@ LDFLAGS = -lssl -lcrypto -lpthread
 
 all: nuclearControl missileSilo submarine radar satellite
 
-nuclearControl: nuclearControl.c common.h
-	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+nuclearControl: nuclearControl.c common.c common.h
+	$(CC) $(CFLAGS) -o $@ $< common.c $(LDFLAGS)
 
-missileSilo: missileSilo.c common.h
-	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+missileSilo: missileSilo.c common.c common.h
+	$(CC) $(CFLAGS) -o $@ $< common.c $(LDFLAGS)
 
-submarine: submarine.c common.h
-	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+submarine: submarine.c common.c common.h
+	$(CC) $(CFLAGS) -o $@ $< common.c $(LDFLAGS)
 
-radar: radar.c common.h
-	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+radar: radar.c common.c common.h
+	$(CC) $(CFLAGS) -o $@ $< common.c $(LDFLAGS)
 
-satellite: satellite.c common.h
-	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+satellite: satellite.c common.c common.h
+	$(CC) $(CFLAGS) -o $@ $< common.c $(LDFLAGS)
 
 clean:
 	rm -f nuclearControl missileSilo submarine radar satellite

@@ -40,9 +40,9 @@
 #define ID_CONTROL "CONTROL" // For logging from control itself
 
 // --- Function Prototypes (from utils.c) ---
-void log_message(const char *source_id, const char *message);
+void log_message(const char *source_id, const char *format, ...); // <<< MUST HAVE ...
 void encrypt_decrypt_xor(char *data, size_t len, const char *key);
-unsigned long simple_checksum(const char *data, const char *key); // Simple verification checksum
+unsigned long simple_checksum(const char *data, const char *key);
 
 // --- Utility Macros ---
 #define UNUSED(x) (void)(x) // Suppress unused parameter warnings

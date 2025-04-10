@@ -1,3 +1,4 @@
+// missileSilo.c
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,9 +10,15 @@
 #include <stdbool.h>
 #include <signal.h>
 
+// ---> ADD THESE LINES <---
+#include <errno.h>
+#include <sys/select.h>
+// ---> END OF ADDED LINES <---
+
 #include "common.h"
 #include "utils.h"
 
+// ... rest of missileSilo.c ...
 #define MY_ID ID_SAT "_Skynet" // Unique ID for this satellite instance
 #define INTEL_UPDATE_INTERVAL 25 // Seconds (Satellites might have specific overpass times)
 #define STATUS_UPDATE_INTERVAL 120 // Seconds

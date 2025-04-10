@@ -1,3 +1,4 @@
+// missileSilo.c
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,8 +10,15 @@
 #include <stdbool.h>
 #include <signal.h>
 
+// ---> ADD THESE LINES <---
+#include <errno.h>
+#include <sys/select.h>
+// ---> END OF ADDED LINES <---
+
 #include "common.h"
 #include "utils.h"
+
+// ... rest of missileSilo.c ...
 
 #define MY_ID ID_RADAR "_Fylingdales" // Unique ID for this radar instance
 #define INTEL_UPDATE_INTERVAL 10 // Seconds (Radars update more frequently)

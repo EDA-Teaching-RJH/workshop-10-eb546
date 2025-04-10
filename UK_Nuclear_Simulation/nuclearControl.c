@@ -208,3 +208,24 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
+void process_and_decrypt_message(int client_socket, SecureMessage *msg, unsigned char *key) {
+    char log_msg[BUFFER_SIZE * 2];
+    
+    if (!verify_message(msg, key)) {
+        log_message("Message verification failed - possible security breach!");
+        return;
+    }
+    
+    if (!decrypt_message(msg, key)) {
+        log_message("Failed to decrypt message");
+        return;
+    }
+    
+    snprintf(log_msg, sizeof(log_msg), "Decrypted message from %s: %s", 
+             msg->sender, msg->payload);
+    log_message(log_msg);
+    
+    // Rest of your processing logic...
+    process_message(client_socket, msg);
+}
+

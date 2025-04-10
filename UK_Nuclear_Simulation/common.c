@@ -1,120 +1,109 @@
 #include "common.h"
-#include <stdarg.h>
-#include <sys/time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <openssl/evp.h>
+#include <pthread.h>
 
-// Global variables (if needed)
-static pthread_mutex_t log_mutex = PTHREAD_MUTEX_INITIALIZER;
+// Constants
+#define BUFFER_SIZE 1024
+#define IV_SIZE 16
+#define LOG_FILE "system.log"
+#define ENCRYPT_LOGS 1
 
-// Initialize OpenSSL crypto
-void init_crypto() {
-    OpenSSL_add_all_algorithms();
-    ERR_load_crypto_strings();
+// Global variables
+pthread_mutex_t log_mutex = PTHREAD_MUTEX_INITIALIZER;
+unsigned char control_key[32];
+
+// SecureMessage structure implementation
+SecureMessage* create_secure_message(const char* data, size_t length) {
+    SecureMessage* msg = (SecureMessage*)malloc(sizeof(SecureMessage));
+    if (!msg) return NULL;
+
+    msg->data = (char*)malloc(length);
+    if (!msg->data) {
+        free(msg);
+        return NULL;
+    }
+
+    memcpy(msg->data, data, length);
+    msg->length = length;
+    return msg;
 }
 
-// Cleanup OpenSSL
-void cleanup_crypto() {
-    EVP_cleanup();
-    ERR_free_strings();
+void free_secure_message(SecureMessage* msg) {
+    if (msg) {
+        if (msg->data) free(msg->data);
+        free(msg);
+    }
 }
 
-// Log messages to file and stdout
-void log_message(const char *message) {
+// File encryption/decryption functions
+int encrypt_file(const char* input_path, const char* output_path, const unsigned char* key) {
+    FILE *input_file = fopen(input_path, "rb");
+    FILE *output_file = fopen(output_path, "wb");
+    if (!input_file || !output_file) return 0;
+
+    unsigned char iv[IV_SIZE];
+    EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
+    
+    // Write IV to output file
+    fwrite(iv, 1, IV_SIZE, output_file);
+
+    unsigned char in_buf[BUFFER_SIZE], out_buf[BUFFER_SIZE + EVP_MAX_BLOCK_LENGTH];
+    int bytes_read, out_len;
+
+    while ((bytes_read = fread(in_buf, 1, BUFFER_SIZE, input_file))) {
+        EVP_EncryptUpdate(ctx, out_buf, &out_len, in_buf, bytes_read);
+        fwrite(out_buf, 1, out_len, output_file);
+    }
+
+    EVP_EncryptFinal_ex(ctx, out_buf, &out_len);
+    fwrite(out_buf, 1, out_len, output_file);
+
+    EVP_CIPHER_CTX_free(ctx);
+    fclose(input_file);
+    fclose(output_file);
+    return 1;
+}
+
+// Logging functions
+void log_message(const char* message) {
     pthread_mutex_lock(&log_mutex);
     
-    FILE *log_file = fopen(LOG_FILE, "a");
-    if (log_file) {
-        time_t now = time(NULL);
-        char *time_str = ctime(&now);
-        time_str[strlen(time_str)-1] = '\0'; // Remove newline
-        
-        fprintf(log_file, "[%s] %s\n", time_str, message);
-        fclose(log_file);
+    FILE* log_file = fopen(LOG_FILE, "a");
+    if (!log_file) {
+        pthread_mutex_unlock(&log_mutex);
+        return;
     }
+
+    time_t now = time(NULL);
+    char time_buf[26];
+    ctime_r(&now, time_buf);
+    time_buf[strlen(time_buf)-1] = '\0'; // Remove newline
+
+    fprintf(log_file, "[%s] %s\n", time_buf, message);
+    fclose(log_file);
     
-    printf("[LOG] %s\n", message);
     pthread_mutex_unlock(&log_mutex);
 }
 
-// Handle errors (print and optionally exit)
-void handle_error(const char *msg, bool fatal) {
-    log_message(msg);
-    if (fatal) {
-        exit(EXIT_FAILURE);
-    }
+// Initialization function
+void initialize_common() {
+    // Initialize control key (in real use, this would be properly secured)
+    memset(control_key, 0xAA, sizeof(control_key));
+    
+    // Initialize log file
+    FILE* log_file = fopen(LOG_FILE, "w");
+    if (log_file) fclose(log_file);
+    
+    log_message("System initialized");
 }
 
-// Encrypt a message using AES-256-CBC
-int encrypt_message(SecureMessage *msg, const unsigned char *key) {
-    EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
-    if (!ctx) return 0;
-
-    // Generate random IV
-    RAND_bytes(msg->iv, IV_SIZE);
-
-    if (EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, msg->iv) != 1) {
-        EVP_CIPHER_CTX_free(ctx);
-        return 0;
-    }
-
-    int len;
-    int ciphertext_len = 0;
-
-    if (EVP_EncryptUpdate(ctx, (unsigned char *)msg->payload, &len, 
-                         (unsigned char *)msg->payload, strlen(msg->payload)) != 1) {
-        EVP_CIPHER_CTX_free(ctx);
-        return 0;
-    }
-    ciphertext_len += len;
-
-    if (EVP_EncryptFinal_ex(ctx, (unsigned char *)msg->payload + len, &len) != 1) {
-        EVP_CIPHER_CTX_free(ctx);
-        return 0;
-    }
-    ciphertext_len += len;
-
-    EVP_CIPHER_CTX_free(ctx);
-    return 1;
-}
-
-// Decrypt a message
-int decrypt_message(SecureMessage *msg, const unsigned char *key) {
-    EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
-    if (!ctx) return 0;
-
-    if (EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, msg->iv) != 1) {
-        EVP_CIPHER_CTX_free(ctx);
-        return 0;
-    }
-
-    int len;
-    int plaintext_len = 0;
-
-    if (EVP_DecryptUpdate(ctx, (unsigned char *)msg->payload, &len, 
-                         (unsigned char *)msg->payload, strlen(msg->payload)) != 1) {
-        EVP_CIPHER_CTX_free(ctx);
-        return 0;
-    }
-    plaintext_len += len;
-
-    if (EVP_DecryptFinal_ex(ctx, (unsigned char *)msg->payload + len, &len) != 1) {
-        EVP_CIPHER_CTX_free(ctx);
-        return 0;
-    }
-    plaintext_len += len;
-
-    msg->payload[plaintext_len] = '\0';
-    EVP_CIPHER_CTX_free(ctx);
-    return 1;
-}
-
-// Verify message authenticity (HMAC)
-int verify_message(SecureMessage *msg, const unsigned char *key) {
-    // In a real system, implement HMAC verification here
-    return 1; // Placeholder
-}
-
-// Generate random key
-void generate_random_key(unsigned char *key, int size) {
-    RAND_bytes(key, size);
+// Cleanup function
+void cleanup_common() {
+    log_message("System shutting down");
+    // Additional cleanup if needed
 }
 

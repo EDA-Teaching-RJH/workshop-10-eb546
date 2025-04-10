@@ -32,3 +32,18 @@ test: all
 
 .PHONY: all clean test
 
+CFLAGS = -Wall -Wextra -O2 -I. -DENCRYPT_LOGS=1  # Set to 0 to disable log encryption
+
+
+SecureMessage msg;
+// ... receive message ...
+if (verify_message(&msg, key)) {
+    if (decrypt_message(&msg, key)) {
+        printf("Decrypted: %s\n", msg.payload);
+    }
+}
+
+decrypt_log_file("nuclear_log.txt", control_key);
+
+
+

@@ -600,3 +600,5 @@ void cleanup_server() {
 
     log_message(ID_CONTROL, "Server cleanup complete.");
 }
+
+

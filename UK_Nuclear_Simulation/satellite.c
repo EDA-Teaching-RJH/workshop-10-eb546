@@ -163,4 +163,3 @@ int main() {
     log_message(MY_ID, "Satellite client stopped.");
     return 0;
 }
-

@@ -16,6 +16,14 @@
 #define INTEL_UPDATE_INTERVAL 15  // Seconds
 #define STATUS_UPDATE_INTERVAL 60 // Seconds
 
+// ---> ADD THESE LINES <---
+#include <errno.h>      // Required for errno and EINTR
+#include <sys/select.h> // Required for select(), fd_set, struct timeval, FD_* macros
+// <sys/time.h> might also be needed on some systems for timeval, but sys/select.h often includes it. Add if errors persist.
+// ---> END OF ADDED LINES <---
+
+// ... rest of the submarine.c code ...
+
 volatile sig_atomic_t keep_running = 1; // Signal handler flag
 
 void signal_handler(int signum) {

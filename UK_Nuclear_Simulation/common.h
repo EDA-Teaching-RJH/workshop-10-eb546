@@ -8,7 +8,7 @@
 
 // --- Configuration ---
 #define SERVER_IP "127.0.0.1" // Loopback for local testing
-#define SERVER_PORT 65000
+#define SERVER_PORT 8080
 #define MAX_CLIENTS 5
 #define BUFFER_SIZE 1024
 #define LOG_DIR "logs"

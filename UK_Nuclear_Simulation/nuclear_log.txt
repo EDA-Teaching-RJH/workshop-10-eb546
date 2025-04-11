@@ -1,0 +1,194 @@
+[Thu Apr 10 17:30:44 2025] No targets file found, starting with empty target list
+[Thu Apr 10 17:30:44 2025] Nuclear Control Center operational and listening for connections
+[Thu Apr 10 17:31:18 2025] New connection from 127.0.0.1
+[Thu Apr 10 17:31:18 2025] Missile Silo connected to Control
+[Thu Apr 10 17:31:18 2025] MISSILE_SILO registered with control
+[Thu Apr 10 17:31:18 2025] [D¿œ<ò0G¶NÇ¼Ä/'¶Ç
+[Thu Apr 10 17:31:25 2025] New connection from 127.0.0.1
+[Thu Apr 10 17:31:25 2025] Submarine connected to Control
+[Thu Apr 10 17:31:25 2025] SUBMARINE registered with control
+[Thu Apr 10 17:31:25 2025] ÂĞ‚¾Ãeì2hÂ9ÉŞL;Äš>ŞÁRènûÌ+8‚0
+[Thu Apr 10 17:31:42 2025] New connection from 127.0.0.1
+[Thu Apr 10 17:31:42 2025] Radar station connected to Control
+[Thu Apr 10 17:31:42 2025] RADAR registered with control
+[Thu Apr 10 17:31:42 2025] Intel received from RADAR: +¬lÒ5³h>ÌÃ¨u*Š'ˆûPÜòPRû§î"²Y¹ÄÏ¨¸u©ÿ„ì.{
+[Thu Apr 10 17:31:42 2025] @İ2µªŠèŒ_ÙØä5¿¾,}ğÜ`“9­µç
+[Thu Apr 10 17:31:42 2025] Intel received from RADAR: ÍW
+b3F” ›?õ‹}Œ"¿$}gGäö*õŸ‹~‹Z,bÑƒ-9ñcÌ)Å­¦m
+[Thu Apr 10 17:31:52 2025] Intel received from RADAR: ,V½¬»éD×S)\ÇxêQÀM–°)\ÏG’7[‘qMG8 °c™dÚP+
+[Thu Apr 10 17:31:56 2025] New connection from 127.0.0.1
+[Thu Apr 10 17:31:56 2025] Surveillance satellite connected to Control
+[Thu Apr 10 17:31:56 2025] SATELLITE registered with control
+[Thu Apr 10 17:31:56 2025] Intel received from SATELLITE: ¤¶,‚
+[Thu Apr 10 17:31:56 2025] –9ì0%üI<e‚MöéW{©\V“ç"êÊQ´F
+[Thu Apr 10 17:32:02 2025] Intel received from RADAR: Zƒ0ÛQ)îk|f^ŸG$Í¬ºöU§wœ‚8_ëãL
+[Thu Apr 10 17:32:06 2025] Intel received from SUBMARINE: ÊìOÍõ¨âÆ1OŠ§A‚(zIš¸FÈ#,ÊŞ{+®´
+[Thu Apr 10 17:32:12 2025] Intel received from SUBMARINE: I+~‘•'G)•ö^Ú,¸Ì2B" ığ·šS´–¾„UQ‘í¥àC®k"LÎò„öIIÒû§ßµ¬¥uˆ„
+[Thu Apr 10 17:32:12 2025] Intel received from RADAR: Kïâ‘3³{j-¼ñµºíÏy‘\l>\•£ÿæGä`
+[Thu Apr 10 17:32:14 2025] TEST MODE ACTIVATED - Simulated war scenario
+[Thu Apr 10 17:32:14 2025] Missile Silo connected to Control
+[Thu Apr 10 17:32:14 2025] New connection from 127.0.0.1
+[Thu Apr 10 17:32:14 2025] No targets file found, starting with empty target list
+[Thu Apr 10 17:32:14 2025] Bind failed
+[Thu Apr 10 17:32:14 2025] MISSILE_SILO registered with control
+[Thu Apr 10 17:32:14 2025] Submarine connected to Control
+[Thu Apr 10 17:32:14 2025] New connection from 127.0.0.1
+[Thu Apr 10 17:32:14 2025] New connection from 127.0.0.1
+[Thu Apr 10 17:32:14 2025] Surveillance satellite connected to Control
+[Thu Apr 10 17:32:14 2025] SUBMARINE registered with control
+[Thu Apr 10 17:32:14 2025] I@³Öì!w¥¾Ğ‚Ô\¿à¸-ş9ë}}I²)$%Ï—ÿ¿
+[Thu Apr 10 17:32:14 2025] êW…®ÍHP\âÃtW"û§Óz~l£òæ"WÌ&wÌG
+[Thu Apr 10 17:32:14 2025] SATELLITE registered with control
+[Thu Apr 10 17:32:14 2025] Intel received from SATELLITE: ú®anåf>qt5æİ_—ò—°;ùe˜!!o+½7•¾[
+[Thu Apr 10 17:32:14 2025] ®ä«Å ˆ—ë„“|åKá{Ü|®0Œ¸Ám§
+[Thu Apr 10 17:32:14 2025] Radar station connected to Control
+[Thu Apr 10 17:32:14 2025] New connection from 127.0.0.1
+[Thu Apr 10 17:32:14 2025] RADAR registered with control
+[Thu Apr 10 17:32:14 2025] Intel received from RADAR: +ı›¥¿êQï@Lš”üyZ^$”$YÇÃm‘ÍR&z#4½è´Úà¤—Ş*cÍ*
+[Thu Apr 10 17:32:14 2025] •=PĞö=-â­1™èÃ¼Çª°Ò.š
+[Thu Apr 10 17:32:14 2025] Intel received from RADAR: õ&øZ‡8÷êW"hş¸€7Ó"FÎ³ÍÉuIí¨Sè€T|6ÆhÚ«Ì1RÁ-
+[Thu Apr 10 17:32:21 2025] Intel received from SATELLITE: İ†^¸—![âÿ8_•±ùCÂRNùÀÓ¨‡x³†çÖëµ@ïæ'ª_§¡ÄoÑÓ÷‹Z_
+[Thu Apr 10 17:32:22 2025] Intel received from RADAR: ^s÷·È€Œ´Š“ÖÊôÀ’2xë‰jşsôğæMú	¿1Ñ)]jôá|Zy0G†ø¢²
+[Thu Apr 10 17:32:24 2025] Intel received from SUBMARINE: Y—ÍõìQ¦A¬µËC{rÙGw@«.‰ºvÆ$etğZö8Å/!d%À˜g$õRÖPLë6.±â
+Š
+[Thu Apr 10 17:32:24 2025] Intel received from RADAR: ±íà<ô6ğTîÁÂõÛØéúÌäAYì÷YkÏªö?ˆ‹Š7é$q;o›[.òÆ~
+[Thu Apr 10 17:32:32 2025] Intel received from RADAR: rBE{6¼Bn1ç7±Nö=¢ÜúZ
+[Thu Apr 10 17:32:34 2025] Intel received from RADAR: Dî’T?õm.tHÑGŠÛ±ÑÈåÁ¢¾U*£w*ùdÅïö~Ÿ#²i°;ïlDu
+[Thu Apr 10 17:32:39 2025] Intel received from SATELLITE: èØ2•ŒÜQÜ¡Åüv©aW>#„!qãgO*no6ÍĞµõ‘‘š_‚às©oæcœÆ\•õUƒ
+[Thu Apr 10 17:32:41 2025] Intel received from SATELLITE: 2îÒ}ú‡˜¥P<N^:~–pÁÖB
+o…Q4L¥F…6ãÿ½Ñø»wñ6ÑÓ÷‹Z_
+[Thu Apr 10 17:32:42 2025] Intel received from SUBMARINE: <nÊØ-	è4+ºõıüâªÑõ–RLuŸCÉè•Š
+:£ïâ…ê·.ıh$–RÖPLë6.±â
+Š
+[Thu Apr 10 17:32:42 2025] Intel received from RADAR: ŞÌd"Á‹0rP1Íº1Ü=¢ÜúZ
+[Thu Apr 10 17:32:44 2025] Intel received from RADAR: Wjãµ1É•Ï³àô:¸KØÑÌÑõÒÇÇÛ†Ziû%ä?uœÚ¿+Åi
+[Thu Apr 10 17:32:48 2025] Intel received from SUBMARINE: ?%+†š·^:b·Ró,4’,Q®±'ÊwÆ5ktsKÂ¼»·:DÒÍ‹¹ú0›uRÖPLë6.±â
+Š
+[Thu Apr 10 17:32:51 2025] Intel received from SATELLITE: •h!.C´¢’ó–`Ó<FÀtP¡U(²kf”‡¯®z<„&±5M…ö™tÑÓ÷‹Z_
+[Thu Apr 10 17:32:52 2025] Intel received from RADAR: Ë±ğ¾İ‰ëDÚ )ìŸ”[ŸïW)Åÿ…š\‘xÓmÜÂ‡¥ĞB&é<Zi
+[Thu Apr 10 17:32:54 2025] Intel received from SUBMARINE: ØÛÁE¥Íûé
+[Thu Apr 10 17:32:54 2025] Intel received from RADAR: G2tw@­’”É®°ÄHÓ	p wö=¾p‡r°ô¬ÃµaqãÔ4/C…¿x6	ÑâB¯
+[Thu Apr 10 17:32:55 2025] Intel received from SUBMARINE: ¼ıB”Óf$nÑ¢JYq(¡PöI5Ã’hä]åËc´
+[Thu Apr 10 17:32:59 2025] Intel received from SATELLITE: `-Yšó“	¯b-ÏŞ}1lËËzBØÆÀÓ°³äì¨ĞŠBÎ]òâ^qÕ”^A9†Ò÷ŒÑ]Ğ¨×2Gê/İD
+[Thu Apr 10 17:33:01 2025] Intel received from SUBMARINE: Vµ-‚ôëâ+6‘;©›‡Øîğxxz½8| 2hÈi Ä£Œ	³ÚFB
+[Thu Apr 10 17:33:02 2025] Intel received from RADAR: Í*D…¯óÎ=5ê¬Îß|-F´Ö¯°ÆµCKgÚ§9±Æ‘áüPÑT„ÜÙ'ë
+[Thu Apr 10 17:33:04 2025] Intel received from RADAR: ÿ’f9½Âëëh¹æş\İìj›m*²"Ê#wû²Ÿd&gØéšíhJYó0
+[Thu Apr 10 17:33:09 2025] Intel received from SATELLITE: Õ/JgòG0ùçğs˜÷¨–­áÅßÆôğ¢û40`{CÑ»~A6V«hX%ËŞÄÓÇh-‹«Ú£4E
+[Thu Apr 10 17:33:11 2025] Intel received from SATELLITE: ñ¬z$–­+àÑÒW~4wûgĞêİÁPT p%1ñ dvˆ§•D©×VÃåHL›àrÉ?tcvYjCeárëMâ
+[Thu Apr 10 17:33:12 2025] Intel received from SUBMARINE: ÎÇCmSk2¹\äçÿƒëí«-wdí6pğìUÆW½š°7è×‰I¨¯Ñöûân›ã“Ş7qTÆÀ0¨®ş¢l
+[Thu Apr 10 17:33:12 2025] Intel received from RADAR: Åq½œá³èöœóÕÍsMÈ)<$iş;ğÛ
+[Thu Apr 10 17:33:13 2025] Intel received from SUBMARINE: qùüúa;‹Oİ6
+[Thu Apr 10 17:33:14 2025] Intel received from RADAR: +w­ı6.›Ìî†©iF÷ø€—rV¤7œvÜÜ¦ÂŸd&gØéšíhJYó0
+[Thu Apr 10 17:33:18 2025] Intel received from SUBMARINE: “ªá8
+æ¬Rª;ö´ h™ÁŒ¤€ƒ
+[Thu Apr 10 17:33:21 2025] Intel received from SATELLITE: 
+[Thu Apr 10 17:33:22 2025] Intel received from RADAR: '+ë3äNå›·¦ëÖò¥£ş‹{çu³«oc·PIÀÊ¢êÏ‚ƒV£`Ã‚
+[Thu Apr 10 17:33:24 2025] Intel received from RADAR: Š_¤<‚Ìø7²Í,#IÆWƒ† s¶Şò%v0”PeAÕ¼‹U„É
+}
+[Thu Apr 10 17:33:29 2025] Intel received from SATELLITE: Èa“7¿‰Õ!ğr†\=İòZá—•eîûèqÈ¬8ì_…Ãú9+Ì	Ö87ÜrŸ‘DŒØ²"I›¦fö
+[Thu Apr 10 17:33:31 2025] Intel received from SATELLITE: zl@ïKtrëÆû‘CİÕ–JLÄ®÷â‹/ø’b°ğtÀÂnÕ£¤sÊúª™øÍ5¨3ğ.q$üÜŸAÉÅr
+[Thu Apr 10 17:33:31 2025] Intel received from SUBMARINE: ¼Z¢A«p×;WNÖõŒ­K«Ü’6Ó\l}sU@câ,×a³7}8Ù‘zE`
+q A€œG0g
+[Thu Apr 10 17:33:32 2025] Intel received from RADAR: 4‘JhÇÌ4Ô+Œ˜†à¼C­\ØínuK
+[Thu Apr 10 17:33:34 2025] Intel received from RADAR: Â,ÎÚS/<©ñ
+[Thu Apr 10 17:33:37 2025] Intel received from SUBMARINE: £ü·‘ê˜¥El—h, g¾¤w
+x¼ĞÖmHsVjY¯§2	N‘¯§Æ
+4'&}8Ù‘zE`
+q A€œG0g
+[Thu Apr 10 17:33:39 2025] Intel received from SATELLITE: Y½Ô4ÚŸ×J¿ÅáÂ¢¤‹ÜşVåÂ 2ò¡|ù´‘9S…êâÇİP§¾‹ ñÜ	æ‡:*À˜ˆÙğk
+[Thu Apr 10 17:33:41 2025] Intel received from SATELLITE: F ˜¨l¯ŞŒVN¤YşÕj•‡!q˜¯ÖÏ€æïæª|Æ/i 
+[Thu Apr 10 17:33:42 2025] Intel received from SUBMARINE: <¦ú-Æáüİ•8ñG™+g÷‚–•D¦Öôï÷ĞÔ{ëõu6?ø2yi
+oÛ5
+[Thu Apr 10 17:33:42 2025] Intel received from RADAR: Üîë.¢œ—´n»^ŸYU`a»9–ZÌh^áìºÓJHÚA9ÈvìJ?¨
+[Thu Apr 10 17:33:43 2025] Intel received from SUBMARINE: #¢…3s]±;T±Û¸¼üàÔÅXak#<	0¿KHŠŞ9~<…oFööğ¼_uhôFŞ—ó¥Ä%Ä;š
+[Thu Apr 10 17:33:44 2025] Intel received from RADAR: –36c× ]sÖÇzL„”S™Ÿp™&*¥’w!¬‘õnŒâJ§sq`ñ§'
+[Thu Apr 10 17:33:49 2025] Intel received from SATELLITE: Ì|:çÉ-¦Xh"ã$~Ò;ø¼
+Ñ\kix
+[Thu Apr 10 17:33:51 2025] Intel received from SATELLITE: ™”t«ÙæVÈ²¶x9hæì•#î“¬×bV"Q¹ş1ŒŸ2·Ç[¦UA $ÑøÀ“A„¸|Àa¡‡L
+[Thu Apr 10 17:33:52 2025] Intel received from RADAR: q1Ç*=ˆ	æAœ$w—@±Øúñ”
+[Thu Apr 10 17:33:54 2025] Intel received from RADAR: cÃÊ²ñê^²lï*äsvŸR’ÿŸšKeo¶¦O¡Fdÿ”|3pØÚìZÚş¥Ó
+[Thu Apr 10 17:33:59 2025] Intel received from SATELLITE: ~ƒ0¬ñÂ .eé\Ñ“g9»	µ&–ƒ4MQ¬uÏ=Ù_4F•T/RA¨ÜHìFÜÀ³’YtC™pµ“D
+[Thu Apr 10 17:34:01 2025] Intel received from SUBMARINE: LæGz‘ô)¢–:RèÜˆ ^ƒLòX4r­p>¶,PkËg 
+[Thu Apr 10 17:34:02 2025] Intel received from RADAR: ½ªbŸm	Í‰ô.]—uo(0°Ÿ•LšXæª@IÌÆ§PºA° xâB%:kêNß
+[Thu Apr 10 17:34:04 2025] Intel received from RADAR: nÆÅFo§•mø"Èœ¿Èå ÃÑÌ0ÒÿÑ!é¡À:Ì`O¹slç8×îÖ•Æ!
+[Thu Apr 10 17:34:07 2025] Intel received from SUBMARINE: ‘¼`6Ÿ¯G!ıÔE<ú ›•œÖé€«ƒõ •©®Ã©ÏêÍNÏÈç¯-˜¶¦
+©ép´ø¡qR­
+[Thu Apr 10 17:34:09 2025] Intel received from SATELLITE: Åj3§°	{£Ş‰0Ù'°ú=Q×´ºğ{›Œûƒ\xâlFÕoÙN~ÍCkñÔKŠìJ)/ÛÈ”4Ä_–<
+[Thu Apr 10 17:34:12 2025] Intel received from RADAR: M4¹Ã÷`q‹3#JqÒ>ü£_èf·Oúœ]£¹œPºA° xâB%:kêNß
+[Thu Apr 10 17:34:14 2025] Intel received from RADAR: M„æ™¸úĞGL4ÛÛœ­“`ğùÄ†º\_wS ‹êŠoã–8{âØ§¸Óä‡3T
+[Thu Apr 10 17:34:18 2025] Intel received from SUBMARINE: µ‡ÂıŸsE¹ët'ƒ(Õ‘_ÚŠl{Àc6IõR
+[Thu Apr 10 17:34:21 2025] Intel received from SATELLITE: ¢aêÿ(Ù¨6¿s.ÿXJYLTüL#rÂ
+[Thu Apr 10 17:34:22 2025] Intel received from RADAR: âã¶»<¶Ãx¦ñ­I“ŠmZ'Á‘qR\c¨éPºA° xâB%:kêNß
+[Thu Apr 10 17:34:24 2025] Intel received from RADAR: +Ãc—ßİ)bJ¢tï}ÛxFN8
+[Thu Apr 10 17:34:31 2025] Intel received from SUBMARINE: .B¾Õp)Tä
+[Thu Apr 10 17:34:31 2025] Intel received from SATELLITE: <ÎN)°¬ƒ¬^_ØäèÚî]l-Öjnq…„pï›TPù¢“ÑÏ¤JµCß1ëA0ˆÁa™«¾\ğ&¦üœìX
+[Thu Apr 10 17:34:32 2025] Intel received from RADAR: *N-ÉãÔ¾ç¡ujŸ¦O4ÍòÛ”Oß±Á)íwŒw}J,Ùµóİc—«M4®Üù	s
+[Thu Apr 10 17:34:34 2025] Intel received from RADAR: †íGvæc¢‘/¨ŞE´JHøX¼7îSB…-rO
+bıÜ\Š„†	~¯´ªHJ¦
+[Thu Apr 10 17:34:36 2025] Intel received from SUBMARINE: Hä^>@ógİÚH@ìpEÔû’ÀëÑ1¬ÖŸüõˆ,´tÁ˜ÏûµI÷®r!ê£i{m«‹¥LÅ3Ò÷;hL"
+[Thu Apr 10 17:34:39 2025] Intel received from SATELLITE: ·ö~çS(HÅsAñ	VhU8§OÔø s5ú:2ÌÒ¢Ûáõ­W™ì”ËiË³ø¸a’FZÀ-i
+[Thu Apr 10 17:34:42 2025] Intel received from RADAR: Øş‹³HB8rÉÊxû#¹y´3kW·"I†×Áñ(cgˆ/x.ºH2ÒÚAÒ®¡ºÜ
+[Thu Apr 10 17:34:44 2025] Connection lost
+[Thu Apr 10 17:34:44 2025] Connection lost
+[Thu Apr 10 17:34:44 2025] Connection lost
+[Thu Apr 10 17:34:44 2025] Connection lost
+[Thu Apr 10 17:34:44 2025] Connection lost
+[Thu Apr 10 17:34:44 2025] Connection lost
+[Thu Apr 10 17:34:44 2025] Connection lost
+[Thu Apr 10 17:34:48 2025] Connection lost
+[Thu Apr 10 17:35:06 2025] No targets file found, starting with empty target list
+[Thu Apr 10 17:35:06 2025] Nuclear Control Center operational and listening for connections
+[Thu Apr 10 17:35:15 2025] New connection from 127.0.0.1
+[Thu Apr 10 17:35:15 2025] Missile Silo connected to Control
+[Thu Apr 10 17:35:15 2025] MISSILE_SILO registered with control
+[Thu Apr 10 17:35:15 2025] ×e¼Á£Æ<ZfCeÿÌ1ÃÑÇ”]ƒbÜŸş—jÿd
+[Thu Apr 10 17:35:19 2025] New connection from 127.0.0.1
+[Thu Apr 10 17:35:19 2025] Submarine connected to Control
+[Thu Apr 10 17:35:19 2025] SUBMARINE registered with control
+[Thu Apr 10 17:35:19 2025] +*	¯nYÙáÖåí~±Ú×Š2ü~DÚ
+ÔÀÜ5
+[Thu Apr 10 17:35:23 2025] Radar station connected to Control
+[Thu Apr 10 17:35:23 2025] New connection from 127.0.0.1
+[Thu Apr 10 17:35:23 2025] RADAR registered with control
+[Thu Apr 10 17:35:23 2025] Intel received from RADAR: üçå´?ŞqÛâ}I<Â9ƒ ğ¥Ö(‹œf=Ğ„m2H.\ú¿²EıIŸêUO¹.
+[Thu Apr 10 17:35:23 2025] òß¿˜•H
+?ñÄ"0F'=s¼#’Q|;ŠL<
+[Thu Apr 10 17:35:23 2025] Intel received from RADAR: =R^jî1«»w²Øt8^Ä—•¤HDoó^WŞr×ñ€IU~ß÷Œ…úÒÁ<
+[Thu Apr 10 17:35:32 2025] New connection from 127.0.0.1
+[Thu Apr 10 17:35:32 2025] Surveillance satellite connected to Control
+[Thu Apr 10 17:35:32 2025] SATELLITE registered with control
+[Thu Apr 10 17:35:32 2025] Intel received from SATELLITE: bĞƒöÙ¦9E”{£Tcª-2•‹ÊS0¡1h/ÎúC±i‹a¬Í¸3§çJ
+[Thu Apr 10 17:35:32 2025] œR¼ïM‘‘r]X3Ã>Ód©"úâ>/"
+[Thu Apr 10 17:35:33 2025] Intel received from RADAR: •GVë˜£ÈÁ5¦ÍÀi@s…¸`
+[Thu Apr 10 17:35:43 2025] Intel received from RADAR: Mc¹»dj e\{p#wíT‹¬vgl<Şùn¨¡yÅÄ"æ›A™+’ÕP­'M¢
+[Thu Apr 10 17:35:53 2025] Intel received from RADAR: ¨CJ·û~½øuû[ÌCB¿m’GI9š‡®Mcƒ…k™^épŸ&çKÿ@?à•Z$øé
+[Thu Apr 10 17:35:57 2025] Intel received from SATELLITE: ‹·km¨áHZÔ"Ÿ…%¦dkŠß.‚ß»õ§zÆ1ĞòDÒGÁú¬5Î¦?³:„*§¿­ØŠB<HòY~
+[Thu Apr 10 17:36:00 2025] Intel received from SUBMARINE: .¸•4kaO°œÌ#*8ÌWï?çŞ°ÍgP€¾;C‰´
+[Thu Apr 10 17:36:03 2025] Intel received from RADAR: 
+8ZÖ¨ó€uH‹ª"I7›O‡E¹vã¾0-v65…6BÃ‰è}ßu!YÙ€ı+‰2
+[Thu Apr 10 17:36:06 2025] Intel received from SUBMARINE: ödh­øµòĞ&.Nt\xMI›vT‹fšîGTĞ*E,C[acÉ»«ğÀÅ;±é†î
+[Thu Apr 10 17:36:13 2025] Intel received from RADAR: D,ìJ6Sœ§uç?0)8lßp”DºfFó˜‰^)¹š£éaµyY"¾Áu
+[Thu Apr 10 17:36:17 2025] Intel received from SATELLITE: ^¹rÇ…ıf %B¯}ñG	¥zÙéİ{†4}ÆÍI=¦Óc§YÉgëÚ³ÿ†Ù«ªë®œk…EG8Ğó
+[Thu Apr 10 17:36:18 2025] Intel received from SUBMARINE: ½æ•õu‘¾{€ÜÕQr
+[Thu Apr 10 17:36:23 2025] Intel received from RADAR: àšHit0Î–ÿ¼~š~d÷=fËE—GŸÆWš£éaµyY"¾Áu
+[Thu Apr 10 17:36:27 2025] Intel received from SATELLITE: AÓJW‡
+[Thu Apr 10 17:36:33 2025] Intel received from RADAR: ÷‹œ@¢»ÿ&tÍ/$}@ªˆÔ6$‘k(k,
+[Thu Apr 10 17:36:36 2025] Intel received from SUBMARINE: bñ¦cU¤ÄÛÆÂ%öãw•²N9i_«¬8ø˜VáŸ/¢¢fÃR½¤ŠêÖ;ˆ”;±é†î
+[Thu Apr 10 17:36:42 2025] Intel received from SUBMARINE: ¢IİÜƒeUNzVæ€3MÎî	«rä8­ºï³8Ğ\ŞŞVYx
+Ïxj;±é†î
+[Thu Apr 10 17:36:43 2025] Intel received from RADAR: *`\Wğô`%¡cÛßcoD~Qw:ß1f»ïªÀMxÛz€öÈá±0$’
+[Thu Apr 10 17:36:47 2025] Intel received from SATELLITE: AÑæwhÛœ~æîÔQ
+[Thu Apr 10 17:36:48 2025] Intel received from SUBMARINE: uÓöLl’%“ìşIF»¬FW|÷–ë¦ÊêVl¯6†gCÓÃf2|W^Ğ&@›¾½‡51_½˜ƒõAÈ¼
+[Thu Apr 10 17:36:53 2025] Intel received from RADAR: ™MníÄêèã>¯UŠóŞÒZ03½êcæ2ùÄwÜ_pŸõXÎ!ÅHb¡)
+[Thu Apr 10 17:36:57 2025] Intel received from SATELLITE: ñğt $›È‹?*‘â;':K.rXZÂ5?™µ÷(­¯÷Øú"6ûºÌ`«†i¶&§¹s’Ù×.í€ÂT•ˆÀÕ 
+[Thu Apr 10 17:37:03 2025] Intel received from RADAR: ‚=pÏp²æ­–ï;û‘R$õÊ§¶a†¤ˆì•A°dhâŒÅ—­¢-3ŸCÀzBäIî
+[Thu Apr 10 17:37:06 2025] Intel received from SUBMARINE: aìœ±Y* GxózÇ¾=ùœeÃ¼Ùíñ\uå1ª!ªÔAx§Adlg^^(½t>::ŒYstIL`W¼
+[Thu Apr 10 17:37:07 2025] Intel received from SATELLITE: –uXÂíSã§¨ğÃ¿9V®ï‡˜¡
+WŒƒìÒ¢gÍ?X´®8“O_(nı©#˜¹s’Ù×.í€ÂT•ˆÀÕ 
+[Thu Apr 10 17:37:12 2025] Intel received from SUBMARINE: 1CjÄà%`¡	éH¼ù$×2ÊF>¸¦ÅSÏê)ÓÅ¨KPŸá,§iµjd75_?ÓŒT4ÉCÆ6øJÂŠbŞ
+[Thu Apr 10 17:37:13 2025] Intel received from RADAR: Í×0¸Pcğ^Ğ­Hˆ-ïfâà!pt!›$ÅsRw‡^,T
+[Thu Apr 10 17:37:17 2025] Intel received from SATELLITE: 1©]¢ÔÀxGˆ#~<Ìo“‚Æ¦†ıëjêËcÚ ú­ÉHd°êqE€HÊ2‡I*©(3%f
+[Thu Apr 10 17:37:20 2025] Connection lost
+[Thu Apr 10 17:37:20 2025] Connection lost
+[Thu Apr 10 17:37:20 2025] Connection lost
+[Thu Apr 10 17:37:24 2025] Connection lost

@@ -12,6 +12,7 @@
 #define SERVER_PORT 8081
 #define LOG_FILE "silo.log"
 #define CAESAR_SHIFT 3
+#define SIMULATION_DURATION 30
 
 void log_event(const char *event_type, const char *details) {
     FILE *fp = fopen(LOG_FILE, "a");
@@ -28,14 +29,14 @@ void log_event(const char *event_type, const char *details) {
     fclose(fp);
 }
 
-void caesar_decrypt(const char * cipherText, char * plaintext, size_t len) {
+void caesar_decrypt(const char *ciphertext, char *plaintext, size_t len) {
     memset(plaintext, 0, len);
-    for (size_t i = 0; i < strlen(cipherText) && i < len - 1; i++) {
-        if (isalpha((unsigned char)cipherText[i])) {
-            char base = isupper((unsigned char)cipherText[i]) ? 'A' : 'a';
-            plaintext[i] = (char)((cipherText[i] - base - CAESAR_SHIFT + 26) % 26 + base);
+    for (size_t i = 0; i < strlen(ciphertext) && i < len - 1; i++) {
+        if (isalpha((unsigned char)ciphertext[i])) {
+            char base = isupper((unsigned char)ciphertext[i]) ? 'A' : 'a';
+            plaintext[i] = (char)((ciphertext[i] - base - CAESAR_SHIFT + 26) % 26 + base);
         } else {
-            plaintext[i] = cipherText[i];
+            plaintext[i] = ciphertext[i];
         }
     }
 }
@@ -104,8 +105,9 @@ int main(void) {
     char plaintext[1024];
     char command[20];
     char target[50];
+    time_t start_time = time(NULL);
 
-    while (1) {
+    while (time(NULL) - start_time < SIMULATION_DURATION) {
         ssize_t bytes = recv(sock, buffer, sizeof(buffer) - 1, 0);
         if (bytes <= 0) {
             log_event("CONNECTION", "Disconnected from Control");
@@ -114,16 +116,16 @@ int main(void) {
         buffer[bytes] = '\0';
 
         char log_msg[1024];
-        snprintf(log_msg, sizeof(log_msg), "Received encrypted: %s", buffer);
+        snprintf(log_msg, sizeof(log_msg), "Encrypted message: %s", buffer);
         log_event("MESSAGE", log_msg);
 
         caesar_decrypt(buffer, plaintext, sizeof(plaintext));
-        snprintf(log_msg, sizeof(log_msg), "Decrypted to: %s", plaintext);
+        snprintf(log_msg, sizeof(log_msg), "Decrypted message: %s", plaintext);
         log_event("MESSAGE", log_msg);
 
         if (parse_command(plaintext, command, target)) {
             if (strcmp(command, "launch") == 0) {
-                snprintf(log_msg, sizeof(log_msg), "Launch command verified, Target: %s", target);
+                snprintf(log_msg, sizeof(log_msg), "Launch command received, Target: %s", target);
                 log_event("COMMAND", log_msg);
             } else {
                 snprintf(log_msg, sizeof(log_msg), "Unknown command: %s", command);
@@ -133,7 +135,7 @@ int main(void) {
     }
 
     close(sock);
-    log_event("SHUTDOWN", "Missile Silo terminated");
+    log_event("SHUTDOWN", "Missile Silo terminated after 30s simulation");
     return 0;
 }
 

@@ -12,6 +12,7 @@
 #define SERVER_PORT 8083
 #define LOG_FILE "radar.log"
 #define CAESAR_SHIFT 3
+#define SIMULATION_DURATION 30
 
 void log_event(const char *event_type, const char *details) {
     FILE *fp = fopen(LOG_FILE, "a");
@@ -41,14 +42,18 @@ void caesar_encrypt(const char *plaintext, char *ciphertext, size_t len) {
 }
 
 void send_intel(int sock) {
+    const char *threat_data[] = {"Enemy Aircraft", "Missile Strike", "Drone Swarm"};
+    const char *locations[] = {"North Atlantic", "English Channel", "Baltic Sea"};
     char message[512];
+    int idx = rand() % 3;
     snprintf(message, sizeof(message),
-             "source:Radar|data:Incoming missiles|threat_level:0.8|location:Airspace");
+             "source:Radar|type:Air|data:%s|threat_level:%.2f|location:%s",
+             threat_data[idx], 0.1 + (rand() % 90) / 100.0, locations[idx]);
     char ciphertext[1024];
     caesar_encrypt(message, ciphertext, sizeof(ciphertext));
 
     char log_msg[1024];
-    snprintf(log_msg, sizeof(log_msg), "Sending encrypted: %s", ciphertext);
+    snprintf(log_msg, sizeof(log_msg), "Encrypted message: %s", ciphertext);
     log_event("MESSAGE", log_msg);
     snprintf(log_msg, sizeof(log_msg), "Original message: %s", message);
     log_event("MESSAGE", log_msg);
@@ -57,7 +62,10 @@ void send_intel(int sock) {
         log_event("ERROR", "Failed to send intelligence");
         return;
     }
-    log_event("INTEL", "Intelligence sent: Incoming missiles, Threat Level: 0.8, Location: Airspace");
+    snprintf(log_msg, sizeof(log_msg), 
+             "Intelligence sent: Type: Air, Details: %s, Threat Level: %.2f, Location: %s",
+             threat_data[idx], 0.1 + (rand() % 90) / 100.0, locations[idx]);
+    log_event("INTEL", log_msg);
 }
 
 int main(void) {
@@ -84,13 +92,14 @@ int main(void) {
 
     log_event("CONNECTION", "Connected to Nuclear Control");
 
-    while (1) {
+    time_t start_time = time(NULL);
+    while (time(NULL) - start_time < SIMULATION_DURATION) {
         send_intel(sock);
         sleep(5);
     }
 
     close(sock);
-    log_event("SHUTDOWN", "Radar terminated");
+    log_event("SHUTDOWN", "Radar terminated after 30s simulation");
     return 0;
 }
 

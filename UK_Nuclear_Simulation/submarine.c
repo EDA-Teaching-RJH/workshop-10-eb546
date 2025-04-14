@@ -12,6 +12,7 @@
 #define SERVER_PORT 8082
 #define LOG_FILE "submarine.log"
 #define CAESAR_SHIFT 3
+#define SIMULATION_DURATION 30
 
 void log_event(const char *event_type, const char *details) {
     FILE *fp = fopen(LOG_FILE, "a");
@@ -89,14 +90,18 @@ int parse_command(const char *message, char *command, char *target) {
 }
 
 void send_intel(int sock) {
+    const char *threat_data[] = {"Enemy Submarine", "Torpedo Launch", "Naval Fleet"};
+    const char *locations[] = {"Norwegian Sea", "Celtic Sea", "Irish Sea"};
     char message[512];
+    int idx = rand() % 3;
     snprintf(message, sizeof(message),
-             "source:Submarine|data:Enemy sub detected|threat_level:0.6|location:Atlantic");
+             "source:Submarine|type:Sea|data:%s|threat_level:%.2f|location:%s",
+             threat_data[idx], 0.1 + (rand() % 90) / 100.0, locations[idx]);
     char ciphertext[1024];
     caesar_encrypt(message, ciphertext, sizeof(ciphertext));
 
     char log_msg[1024];
-    snprintf(log_msg, sizeof(log_msg), "Sending encrypted: %s", ciphertext);
+    snprintf(log_msg, sizeof(log_msg), "Encrypted message: %s", ciphertext);
     log_event("MESSAGE", log_msg);
     snprintf(log_msg, sizeof(log_msg), "Original message: %s", message);
     log_event("MESSAGE", log_msg);
@@ -105,7 +110,10 @@ void send_intel(int sock) {
         log_event("ERROR", "Failed to send intelligence");
         return;
     }
-    log_event("INTEL", "Intelligence sent: Enemy sub detected, Threat Level: 0.6, Location: Atlantic");
+    snprintf(log_msg, sizeof(log_msg), 
+             "Intelligence sent: Type: Sea, Details: %s, Threat Level: %.2f, Location: %s",
+             threat_data[idx], 0.1 + (rand() % 90) / 100.0, locations[idx]);
+    log_event("INTEL", log_msg);
 }
 
 int main(void) {
@@ -132,14 +140,15 @@ int main(void) {
 
     log_event("CONNECTION", "Connected to Nuclear Control");
 
-    send_intel(sock);
-
     char buffer[1024];
     char plaintext[1024];
     char command[20];
     char target[50];
+    time_t start_time = time(NULL);
 
-    while (1) {
+    while (time(NULL) - start_time < SIMULATION_DURATION) {
+        send_intel(sock);
+
         ssize_t bytes = recv(sock, buffer, sizeof(buffer) - 1, 0);
         if (bytes <= 0) {
             log_event("CONNECTION", "Disconnected from Control");
@@ -148,26 +157,27 @@ int main(void) {
         buffer[bytes] = '\0';
 
         char log_msg[1024];
-        snprintf(log_msg, sizeof(log_msg), "Received encrypted: %s", buffer);
+        snprintf(log_msg, sizeof(log_msg), "Encrypted message: %s", buffer);
         log_event("MESSAGE", log_msg);
 
         caesar_decrypt(buffer, plaintext, sizeof(plaintext));
-        snprintf(log_msg, sizeof(log_msg), "Decrypted to: %s", plaintext);
+        snprintf(log_msg, sizeof(log_msg), "Decrypted message: %s", plaintext);
         log_event("MESSAGE", log_msg);
 
         if (parse_command(plaintext, command, target)) {
             if (strcmp(command, "launch") == 0) {
-                snprintf(log_msg, sizeof(log_msg), "Launch command verified, Target: %s", target);
+                snprintf(log_msg, sizeof(log_msg), "Launch command received, Target: %s", target);
                 log_event("COMMAND", log_msg);
             } else {
                 snprintf(log_msg, sizeof(log_msg), "Unknown command: %s", command);
                 log_event("ERROR", log_msg);
             }
         }
+        sleep(5);
     }
 
     close(sock);
-    log_event("SHUTDOWN", "Submarine terminated");
+    log_event("SHUTDOWN", "Submarine terminated after 30s simulation");
     return 0;
 }
 

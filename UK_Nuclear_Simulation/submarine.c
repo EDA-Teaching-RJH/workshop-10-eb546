@@ -94,16 +94,17 @@ void send_intel(int sock) {
     const char *locations[] = {"Norwegian Sea", "Celtic Sea", "Irish Sea"};
     char message[512];
     int idx = rand() % 3;
+    double threat_level = 0.1 + (rand() % 90) / 100.0;
     snprintf(message, sizeof(message),
              "source:Submarine|type:Sea|data:%s|threat_level:%.2f|location:%s",
-             threat_data[idx], 0.1 + (rand() % 90) / 100.0, locations[idx]);
+             threat_data[idx], threat_level, locations[idx]);
     char ciphertext[1024];
     caesar_encrypt(message, ciphertext, sizeof(ciphertext));
 
-    char log_msg[1024];
-    snprintf(log_msg, sizeof(log_msg), "Encrypted message: %s", ciphertext);
+    char log_msg[2048];
+    snprintf(log_msg, sizeof(log_msg), "Encrypted message: %.1000s", ciphertext);
     log_event("MESSAGE", log_msg);
-    snprintf(log_msg, sizeof(log_msg), "Original message: %s", message);
+    snprintf(log_msg, sizeof(log_msg), "Original message: %.1000s", message);
     log_event("MESSAGE", log_msg);
 
     if (send(sock, ciphertext, strlen(ciphertext), 0) < 0) {
@@ -112,7 +113,7 @@ void send_intel(int sock) {
     }
     snprintf(log_msg, sizeof(log_msg), 
              "Intelligence sent: Type: Sea, Details: %s, Threat Level: %.2f, Location: %s",
-             threat_data[idx], 0.1 + (rand() % 90) / 100.0, locations[idx]);
+             threat_data[idx], threat_level, locations[idx]);
     log_event("INTEL", log_msg);
 }
 
@@ -144,6 +145,7 @@ int main(void) {
     char plaintext[1024];
     char command[20];
     char target[50];
+    char log_msg[2048];
     time_t start_time = time(NULL);
 
     while (time(NULL) - start_time < SIMULATION_DURATION) {
@@ -156,12 +158,11 @@ int main(void) {
         }
         buffer[bytes] = '\0';
 
-        char log_msg[1024];
-        snprintf(log_msg, sizeof(log_msg), "Encrypted message: %s", buffer);
+        snprintf(log_msg, sizeof(log_msg), "Encrypted message: %.1000s", buffer);
         log_event("MESSAGE", log_msg);
 
         caesar_decrypt(buffer, plaintext, sizeof(plaintext));
-        snprintf(log_msg, sizeof(log_msg), "Decrypted message: %s", plaintext);
+        snprintf(log_msg, sizeof(log_msg), "Decrypted message: %.1000s", plaintext);
         log_event("MESSAGE", log_msg);
 
         if (parse_command(plaintext, command, target)) {

@@ -47,16 +47,17 @@ void send_intel(int sock) {
     const char *locations[] = {"Arctic Ocean", "Mediterranean", "Barents Sea"};
     char message[512];
     int idx = rand() % 3;
+    double threat_level = 0.1 + (rand() % 90) / 100.0;
     snprintf(message, sizeof(message),
              "source:Satellite|type:%s|data:%s|threat_level:%.2f|location:%s",
-             threat_types[idx % 2], threat_data[idx], 0.1 + (rand() % 90) / 100.0, locations[idx]);
+             threat_types[idx % 2], threat_data[idx], threat_level, locations[idx]);
     char ciphertext[1024];
     caesar_encrypt(message, ciphertext, sizeof(ciphertext));
 
-    char log_msg[1024];
-    snprintf(log_msg, sizeof(log_msg), "Encrypted message: %s", ciphertext);
+    char log_msg[2048];
+    snprintf(log_msg, sizeof(log_msg), "Encrypted message: %.1000s", ciphertext);
     log_event("MESSAGE", log_msg);
-    snprintf(log_msg, sizeof(log_msg), "Original message: %s", message);
+    snprintf(log_msg, sizeof(log_msg), "Original message: %.1000s", message);
     log_event("MESSAGE", log_msg);
 
     if (send(sock, ciphertext, strlen(ciphertext), 0) < 0) {
@@ -65,7 +66,7 @@ void send_intel(int sock) {
     }
     snprintf(log_msg, sizeof(log_msg), 
              "Intelligence sent: Type: %s, Details: %s, Threat Level: %.2f, Location: %s",
-             threat_types[idx % 2], threat_data[idx], 0.1 + (rand() % 90) / 100.0, locations[idx]);
+             threat_types[idx % 2], threat_data[idx], threat_level, locations[idx]);
     log_event("INTEL", log_msg);
 }
 

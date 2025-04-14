@@ -105,6 +105,7 @@ int main(void) {
     char plaintext[1024];
     char command[20];
     char target[50];
+    char log_msg[2048];
     time_t start_time = time(NULL);
 
     while (time(NULL) - start_time < SIMULATION_DURATION) {
@@ -115,12 +116,11 @@ int main(void) {
         }
         buffer[bytes] = '\0';
 
-        char log_msg[1024];
-        snprintf(log_msg, sizeof(log_msg), "Encrypted message: %s", buffer);
+        snprintf(log_msg, sizeof(log_msg), "Encrypted message: %.1000s", buffer);
         log_event("MESSAGE", log_msg);
 
         caesar_decrypt(buffer, plaintext, sizeof(plaintext));
-        snprintf(log_msg, sizeof(log_msg), "Decrypted message: %s", plaintext);
+        snprintf(log_msg, sizeof(log_msg), "Decrypted message: %.1000s", plaintext);
         log_event("MESSAGE", log_msg);
 
         if (parse_command(plaintext, command, target)) {

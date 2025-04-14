@@ -118,8 +118,8 @@ void *handle_client(void *arg) {
     char buffer[1024];
     char plaintext[1024];
     Intel intel;
+    char log_msg[2048]; // Increased buffer size
 
-    char log_msg[1024];
     snprintf(log_msg, sizeof(log_msg), "Client connected from %s:%d", 
              client->ip, client->port);
     log_event("CONNECTION", log_msg);
@@ -135,11 +135,11 @@ void *handle_client(void *arg) {
         }
         buffer[bytes] = '\0';
 
-        snprintf(log_msg, sizeof(log_msg), "Encrypted message: %s", buffer);
+        snprintf(log_msg, sizeof(log_msg), "Encrypted message: %.1000s", buffer);
         log_event("MESSAGE", log_msg);
 
         caesar_decrypt(buffer, plaintext, sizeof(plaintext));
-        snprintf(log_msg, sizeof(log_msg), "Decrypted message: %s", plaintext);
+        snprintf(log_msg, sizeof(log_msg), "Decrypted message: %.1000s", plaintext);
         log_event("MESSAGE", log_msg);
 
         if (parse_intel(plaintext, &intel)) {
@@ -148,7 +148,7 @@ void *handle_client(void *arg) {
                      intel.source, intel.type, intel.data, intel.threat_level, intel.location);
             log_event("THREAT", log_msg);
         } else {
-            snprintf(log_msg, sizeof(log_msg), "Failed to parse: %s", plaintext);
+            snprintf(log_msg, sizeof(log_msg), "Failed to parse: %.1000s", plaintext);
             log_event("ERROR", log_msg);
         }
     }
@@ -174,7 +174,7 @@ void simulate_war_test(Client *clients, size_t client_count) {
     intel.threat_level = 0.1 + (rand() % 90) / 100.0;
     snprintf(intel.location, sizeof(intel.location), "%s", locations[rand() % 4]);
 
-    char log_msg[512];
+    char log_msg[1024];
     snprintf(log_msg, sizeof(log_msg), 
              "Source: %s, Type: %s, Details: %s, Threat Level: %.2f, Location: %s",
              intel.source, intel.type, intel.data, intel.threat_level, intel.location);
@@ -185,7 +185,7 @@ void simulate_war_test(Client *clients, size_t client_count) {
         snprintf(command, sizeof(command), "command:launch|target:%s", intel.location);
         char ciphertext[512];
         caesar_encrypt(command, ciphertext, sizeof(ciphertext));
-        snprintf(log_msg, sizeof(log_msg), "Encrypted command: %s", ciphertext);
+        snprintf(log_msg, sizeof(log_msg), "Encrypted command: %.500s", ciphertext);
         log_event("COMMAND", log_msg);
         snprintf(log_msg, sizeof(log_msg), "Decrypted command: %s", command);
         log_event("COMMAND", log_msg);
@@ -255,7 +255,7 @@ int main(int argc, char *argv[]) {
     int ports[] = {PORT_SILO, PORT_SUB, PORT_RADAR, PORT_SAT};
     int server_socks[MAX_CLIENTS];
     pthread_t threads[MAX_CLIENTS];
-    Client *clients[MAX_CLIENTS];
+    Client clients[MAX_CLIENTS];
     size_t client_count = 0;
     time_t start_time = time(NULL);
 
@@ -278,20 +278,12 @@ int main(int argc, char *argv[]) {
             continue;
         }
 
-        Client *client = malloc(sizeof(Client));
-        if (!client) {
-            perror("Memory allocation failed");
-            close(client_sock);
-            continue;
-        }
-        client->sock = client_sock;
-        client->port = ports[i];
-        inet_ntop(AF_INET, &client_addr.sin_addr, client->ip, sizeof(client->ip));
+        clients[client_count].sock = client_sock;
+        clients[client_count].port = ports[i];
+        inet_ntop(AF_INET, &client_addr.sin_addr, clients[client_count].ip, sizeof(clients[client_count].ip));
 
-        clients[client_count] = client;
-        if (pthread_create(&threads612client_count], NULL, handle_client, client) != 0) {
+        if (pthread_create(&threads[client_count], NULL, handle_client, &clients[client_count]) != 0) {
             perror("Thread creation failed");
-            free(client);
             close(client_sock);
             continue;
         }
@@ -302,7 +294,6 @@ int main(int argc, char *argv[]) {
         simulate_war_test(clients, client_count);
     }
 
-    // Wait until 30 seconds have passed
     while (time(NULL) - start_time < SIMULATION_DURATION) {
         char log_msg[256];
         snprintf(log_msg, sizeof(log_msg), "Simulation running: %ld seconds remaining",
@@ -311,14 +302,12 @@ int main(int argc, char *argv[]) {
         sleep(5);
     }
 
-    // Cleanup
     for (size_t i = 0; i < client_count; i++) {
-        pthread_cancel(threads[i]); // Force threads to exit
+        pthread_cancel(threads[i]);
     }
     for (size_t i = 0; i < client_count; i++) {
         pthread_join(threads[i], NULL);
-        // Sockets closed in handle_client
-        free(clients[i]);
+        close(clients[i].sock);
     }
     for (int i = 0; i < MAX_CLIENTS; i++) {
         close(server_socks[i]);
@@ -327,4 +316,3 @@ int main(int argc, char *argv[]) {
     log_event("SHUTDOWN", "Nuclear Control terminated after 30s simulation");
     return 0;
 }
-

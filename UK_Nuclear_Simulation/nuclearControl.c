@@ -1,210 +1,183 @@
-#include "common.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <openssl/aes.h>
+#include <openssl/rand.h>
+#include <time.h>
+#include <pthread.h>
 
-// Global variables
-static unsigned char control_key[KEY_SIZE];
-static Target targets[MAX_TARGETS];
-static int target_count = 0;
-static bool test_mode = false;
-static pthread_mutex_t target_mutex = PTHREAD_MUTEX_INITIALIZER;
-static pthread_mutex_t log_mutex = PTHREAD_MUTEX_INITIALIZER;
+#define PORT_SILO 8081
+#define PORT_SUB 8082
+#define PORT_RADAR 8083
+#define PORT_SAT 8084
+#define MAX_CLIENTS 4
+#define KEY_SIZE 32
+#define LOG_FILE "control.log"
 
-// Function to load targets from file
-void load_targets() {
-    FILE *file = fopen("targets.dat", "rb");
-    if (file) {
-        pthread_mutex_lock(&target_mutex);
-        target_count = fread(targets, sizeof(Target), MAX_TARGETS, file);
-        pthread_mutex_unlock(&target_mutex);
-        fclose(file);
-        log_message("Loaded targets from file");
-    } else {
-        log_message("No targets file found, starting with empty target list");
+// Simulated AES key (in practice, use secure key exchange)
+unsigned char aes_key[KEY_SIZE] = "thisisaverysecretkeyforencryption!";
+
+typedef struct {
+    char source[20];
+    char data[256];
+    double threat_level;
+    char location[50];
+} Intel;
+
+void log_event(const char *event) {
+    FILE *fp = fopen(LOG_FILE, "a");
+    if (!fp) {
+        perror("Log file open failed");
+        return;
     }
+    time_t now = time(NULL);
+    fprintf(fp, "[%s] %s\n", ctime(&now), event);
+    fclose(fp);
 }
 
-// Function to save targets to file
-void save_targets() {
-    FILE *file = fopen("targets.dat", "wb");
-    if (file) {
-        pthread_mutex_lock(&target_mutex);
-        fwrite(targets, sizeof(Target), target_count, file);
-        pthread_mutex_unlock(&target_mutex);
-        fclose(file);
-        log_message("Saved targets to file");
-    } else {
-        handle_error("Failed to save targets", false);
-    }
+void encrypt_message(const char *plaintext, char *ciphertext, int *len) {
+    // Simplified AES encryption placeholder
+    snprintf(ciphertext, *len, "ENCRYPTED:%s", plaintext);
 }
 
-// Function to process incoming messages
-void process_message(int client_socket, SecureMessage *msg) {
-    char log_msg[BUFFER_SIZE * 2];
-    
-    switch(msg->type) {
-        case MSG_REGISTER:
-            snprintf(log_msg, sizeof(log_msg), "%s registered with control", msg->sender);
-            log_message(log_msg);
-            
-            // Send acknowledgement
-            SecureMessage response;
-            response.type = MSG_STATUS;
-            strcpy(response.sender, "CONTROL");
-            strcpy(response.payload, "Registered successfully");
-            encrypt_message(&response, control_key);
-            send(client_socket, &response, sizeof(response), 0);
-            break;
-            
-        case MSG_INTEL:
-            snprintf(log_msg, sizeof(log_msg), "Intel received from %s: %s", msg->sender, msg->payload);
-            log_message(log_msg);
-            
-            // In test mode, randomly decide if this is a threat
-            if (test_mode && rand() % 100 < 30) { // 30% chance of threat in test mode
-                log_message("TEST MODE: Simulated threat detected!");
-                
-                // Select a random target
-                pthread_mutex_lock(&target_mutex);
-                int target_idx = rand() % target_count;
-                Target target = targets[target_idx];
-                pthread_mutex_unlock(&target_mutex);
-                
-                // Decide launch platform based on target location
-                const char *platform = (target.longitude < -30) ? "SUBMARINE" : "MISSILE_SILO";
-                
-                snprintf(log_msg, sizeof(log_msg), 
-                        "TEST MODE: Launching nuclear strike on %s via %s", 
-                        target.name, platform);
-                log_message(log_msg);
-                
-                // Prepare launch order
-                SecureMessage launch_order;
-                launch_order.type = MSG_LAUNCH_ORDER;
-                strcpy(launch_order.sender, "CONTROL");
-                snprintf(launch_order.payload, sizeof(launch_order.payload),
-                        "TARGET:%s,LAT:%f,LON:%f", target.name, target.latitude, target.longitude);
-                
-                encrypt_message(&launch_order, control_key);
-                send(client_socket, &launch_order, sizeof(launch_order), 0);
-            }
-            break;
-            
-        case MSG_LAUNCH_CONFIRM:
-            snprintf(log_msg, sizeof(log_msg), "Launch confirmed by %s: %s", msg->sender, msg->payload);
-            log_message(log_msg);
-            break;
-            
-        default:
-            snprintf(log_msg, sizeof(log_msg), "Unknown message type from %s", msg->sender);
-            log_message(log_msg);
-            break;
+int parse_intel(const char *message, Intel *intel) {
+    // Parse message like "source:Radar|data:Incoming|threat_level:0.8|location:Airspace"
+    char *copy = strdup(message);
+    if (!copy) return 0;
+
+    char *token = strtok(copy, "|");
+    while (token) {
+        char *key = strtok(token, ":");
+        char *value = strtok(NULL, ":");
+        if (!key || !value) {
+            free(copy);
+            return 0;
+        }
+        if (strcmp(key, "source") == 0) strncpy(intel->source, value, sizeof(intel->source));
+        else if (strcmp(key, "data") == 0) strncpy(intel->data, value, sizeof(intel->data));
+        else if (strcmp(key, "threat_level") == 0) intel->threat_level = atof(value);
+        else if (strcmp(key, "location") == 0) strncpy(intel->location, value, sizeof(intel->location));
+        token = strtok(NULL, "|");
     }
+    free(copy);
+    return 1;
 }
 
-// Thread function to handle client connections
 void *handle_client(void *arg) {
-    int client_socket = *((int *)arg);
-    free(arg);
-    
-    SecureMessage msg;
-    int bytes_received;
-    
-    while ((bytes_received = recv(client_socket, &msg, sizeof(msg), 0)) > 0) {
-        if (bytes_received != sizeof(msg)) {
-            log_message("Received incomplete message");
-            continue;
+    int client_sock = *(int *)arg;
+    char buffer[1024];
+    Intel intel = {0};
+
+    while (1) {
+        int bytes = recv(client_sock, buffer, sizeof(buffer) - 1, 0);
+        if (bytes <= 0) {
+            log_event("Client disconnected");
+            break;
         }
-        
-        if (verify_message(&msg, control_key)) {
-            decrypt_message(&msg, control_key);
-            process_message(client_socket, &msg);
+        buffer[bytes] = '\0';
+
+        if (parse_intel(buffer, &intel)) {
+            char log[512];
+            snprintf(log, sizeof(log), "Received intel from %s: %s, threat: %.2f", 
+                     intel.source, intel.data, intel.threat_level);
+            log_event(log);
         } else {
-            log_message("Message verification failed - possible security breach!");
+            log_event("Invalid message format");
         }
     }
-    
-    close(client_socket);
+    close(client_sock);
+    free(arg);
     return NULL;
 }
 
+void simulate_war_test() {
+    Intel intel;
+    snprintf(intel.source, sizeof(intel.source), "TEST");
+    snprintf(intel.data, sizeof(intel.data), "Simulated enemy launch detected");
+    intel.threat_level = (double)(rand() % 100) / 100.0;
+    snprintf(intel.location, sizeof(intel.location), "North Sea");
+
+    char log[512];
+    snprintf(log, sizeof(log), "War test intel: %s, threat: %.2f", intel.data, intel.threat_level);
+    log_event(log);
+
+    if (intel.threat_level > 0.7) {
+        char command[256];
+        snprintf(command, sizeof(command), "command:launch|target:North Sea");
+        char ciphertext[1024];
+        int len = sizeof(ciphertext);
+        encrypt_message(command, ciphertext, &len);
+        log_event("Launch command issued");
+        // Send to silo/submarine (implemented in full code)
+    }
+}
+
 int main(int argc, char *argv[]) {
-    // Check for test mode
+    int test_mode = 0;
     if (argc > 1 && strcmp(argv[1], "--test") == 0) {
-        test_mode = true;
-        log_message("TEST MODE ACTIVATED - Simulated war scenario");
+        test_mode = 1;
+        srand(time(NULL));
     }
-    
-    // Initialize crypto
-    init_crypto();
-    generate_random_key(control_key, KEY_SIZE);
-    
-    // Load targets
-    load_targets();
-    
-    // Create server socket
-    int server_fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (server_fd < 0) {
-        handle_error("Socket creation failed", true);
+
+    int server_sock, client_sock;
+    struct sockaddr_in server_addr, client_addr;
+    socklen_t addr_len = sizeof(client_addr);
+    pthread_t threads[MAX_CLIENTS];
+    int thread_count = 0;
+
+    server_sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (server_sock < 0) {
+        perror("Socket creation failed");
+        exit(1);
     }
-    
-    // Set socket options
-    int opt = 1;
-    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) {
-        handle_error("Setsockopt failed", true);
+
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_addr.s_addr = INADDR_ANY;
+    server_addr.sin_port = htons(PORT_SILO); // Example port
+
+    if (bind(server_sock, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
+        perror("Bind failed");
+        close(server_sock);
+        exit(1);
     }
-    
-    // Bind socket
-    struct sockaddr_in address;
-    address.sin_family = AF_INET;
-    address.sin_addr.s_addr = INADDR_ANY;
-    address.sin_port = htons(CONTROL_PORT);
-    
-    if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
-        handle_error("Bind failed", true);
+
+    if (listen(server_sock, 5) < 0) {
+        perror("Listen failed");
+        close(server_sock);
+        exit(1);
     }
-    
-    // Listen for connections
-    if (listen(server_fd, MAX_CLIENTS) < 0) {
-        handle_error("Listen failed", true);
+
+    log_event("Nuclear Control started");
+
+    if (test_mode) {
+        simulate_war_test();
     }
-    
-    log_message("Nuclear Control Center operational and listening for connections");
-    
-    // Main server loop
+
     while (1) {
-        int new_socket;
-        int addrlen = sizeof(address);
-        
-        if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0) {
-            handle_error("Accept failed", false);
+        client_sock = accept(server_sock, (struct sockaddr *)&client_addr, &addr_len);
+        if (client_sock < 0) {
+            perror("Accept failed");
             continue;
         }
-        
-        // Log new connection
-        char ip_str[INET_ADDRSTRLEN];
-        inet_ntop(AF_INET, &address.sin_addr, ip_str, INET_ADDRSTRLEN);
-        char log_msg[100];
-        snprintf(log_msg, sizeof(log_msg), "New connection from %s", ip_str);
-        log_message(log_msg);
-        
-        // Create thread for client
-        pthread_t thread_id;
-        int *client_socket = malloc(sizeof(int));
-        *client_socket = new_socket;
-        
-        if (pthread_create(&thread_id, NULL, handle_client, (void*)client_socket) < 0) {
-            handle_error("Thread creation failed", false);
-            free(client_socket);
-            close(new_socket);
+
+        int *client_sock_ptr = malloc(sizeof(int));
+        if (!client_sock_ptr) {
+            perror("Memory allocation failed");
+            close(client_sock);
+            continue;
         }
-        
-        // Detach thread so resources are automatically freed on exit
-        pthread_detach(thread_id);
+        *client_sock_ptr = client_sock;
+
+        if (pthread_create(&threads[thread_count++], NULL, handle_client, client_sock_ptr) != 0) {
+            perror("Thread creation failed");
+            free(client_sock_ptr);
+            close(client_sock);
+        }
     }
-    
-    // Cleanup (though we never get here in this simple example)
-    close(server_fd);
-    cleanup_crypto();
-    save_targets();
+
+    close(server_sock);
     return 0;
 }
 

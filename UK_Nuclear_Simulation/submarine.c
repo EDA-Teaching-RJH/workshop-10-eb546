@@ -1,149 +1,117 @@
-#include "common.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <openssl/aes.h>
 
-static unsigned char submarine_key[KEY_SIZE];
-static bool launch_capability = true;
-static bool stealth_mode = false;
+#define SERVER_IP "127.0.0.1"
+#define SERVER_PORT 8082
+#define LOG_FILE "submarine.log"
 
-// Function to simulate missile launch
-void launch_missile(const char *target_info) {
-    char log_msg[BUFFER_SIZE];
-    snprintf(log_msg, sizeof(log_msg), "SUBMARINE: Launching missile at %s", target_info);
-    log_message(log_msg);
-    
-    // Simulate launch sequence
-    for (int i = 5; i > 0; i--) {
-        snprintf(log_msg, sizeof(log_msg), "Underwater launch in %d...", i);
-        log_message(log_msg);
-        sleep(1);
+unsigned char aes_key[32] = "thisisaverysecretkeyforencryption!";
+
+void log_event(const char *event) {
+    FILE *fp = fopen(LOG_FILE, "a");
+    if (!fp) {
+        perror("Log file open failed");
+        return;
     }
-    
-    log_message("Missile launched! Engaging stealth mode");
-    stealth_mode = true;
+    time_t now = time(NULL);
+    fprintf(fp, "[%s] %s\n", ctime(&now), event);
+    fclose(fp);
 }
 
-// Function to gather intel
-void gather_intel(int sock, unsigned char *key) {
-    const char *intel_reports[] = {
-        "No hostile contacts detected",
-        "Commercial shipping traffic normal",
-        "Detected possible submarine activity at grid DH-34",
-        "Sonar contacts clean",
-        "Thermal layer detected at 200m",
-        "Possible enemy warship at grid FJ-12"
-    };
-    
-    int report_idx = rand() % (sizeof(intel_reports) / sizeof(intel_reports[0]));
-    
-    SecureMessage msg;
-    msg.type = MSG_INTEL;
-    strcpy(msg.sender, "SUBMARINE");
-    strcpy(msg.payload, intel_reports[report_idx]);
-    
-    encrypt_message(&msg, key);
-    send(sock, &msg, sizeof(msg), 0);
+void encrypt_message(const char *plaintext, char *ciphertext, int *len) {
+    snprintf(ciphertext, *len, "ENCRYPTED:%s", plaintext);
+}
+
+int parse_command(const char *message, char *command, char *target) {
+    char *copy = strdup(message);
+    if (!copy) return 0;
+
+    char *token = strtok(copy, "|");
+    while (token) {
+        char *key = strtok(token, ":");
+        char *value = strtok(NULL, ":");
+        if (!key || !value) {
+            free(copy);
+            return 0;
+        }
+        if (strcmp(key, "command") == 0) strncpy(command, value, 20);
+        else if (strcmp(key, "target") == 0) strncpy(target, value, 50);
+        token = strtok(NULL, "|");
+    }
+    free(copy);
+    return 1;
+}
+
+void send_intel(int sock) {
+    char message[512];
+    snprintf(message, sizeof(message), 
+             "source:Submarine|data:Enemy sub detected|threat_level:0.6|location:Atlantic");
+    char ciphertext[1024];
+    int len = sizeof(ciphertext);
+    encrypt_message(message, ciphertext, &len);
+
+    send(sock, ciphertext, strlen(ciphertext), 0);
+    log_event("Intelligence sent");
 }
 
 int main() {
-    // Initialize crypto
-    init_crypto();
-    
-    // In a real system, this would be pre-shared or exchanged via secure channel
-    memcpy(submarine_key, "SECRET_KEY_SUBMARINE_1234567890", KEY_SIZE);
-    
-    // Create socket
-    int sock = socket(AF_INET, SOCK_STREAM, 0);
+    int sock;
+    struct sockaddr_in server_addr;
+    char buffer[1024];
+    char plaintext[1024];
+    char command[20];
+    char target[50];
+
+    sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock < 0) {
-        handle_error("Socket creation failed", true);
+        perror("Socket creation failed");
+        exit(1);
     }
-    
-    // Configure server address
-    struct sockaddr_in serv_addr;
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(CONTROL_PORT);
-    
-    if (inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr) <= 0) {
-        handle_error("Invalid address", true);
+
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(SERVER_PORT);
+    inet_pton(AF_INET, SERVER_IP, &server_addr.sin_addr);
+
+    if (connect(sock, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
+        perror("Connection failed");
+        close(sock);
+        exit(1);
     }
-    
-    // Connect to control
-    if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
-        handle_error("Connection failed", true);
-    }
-    
-    log_message("Submarine connected to Control");
-    
-    // Register with control
-    SecureMessage msg;
-    msg.type = MSG_REGISTER;
-    strcpy(msg.sender, "SUBMARINE");
-    strcpy(msg.payload, "Ready for commands");
-    
-    encrypt_message(&msg, submarine_key);
-    send(sock, &msg, sizeof(msg), 0);
-    
-    // Main loop
+
+    log_event("Submarine connected to Control");
+
+    // Send periodic intel
+    send_intel(sock);
+
     while (1) {
-        // Randomly gather intel
-        if (rand() % 10 < 3) { // 30% chance each iteration
-            gather_intel(sock, submarine_key);
+        int bytes = recv(sock, buffer, sizeof(buffer) - 1, 0);
+        if (bytes <= 0) {
+            log_event("Connection lost");
+            break;
         }
-        
-        // Check for messages from control
-        fd_set read_fds;
-        FD_ZERO(&read_fds);
-        FD_SET(sock, &read_fds);
-        
-        struct timeval tv;
-        tv.tv_sec = 1;
-        tv.tv_usec = 0;
-        
-        if (select(sock + 1, &read_fds, NULL, NULL, &tv) > 0) {
-            if (FD_ISSET(sock, &read_fds)) {
-                int bytes_received = recv(sock, &msg, sizeof(msg), 0);
-                if (bytes_received <= 0) {
-                    handle_error("Connection lost", false);
-                    break;
+        buffer[bytes] = '\0';
+
+        if (verify_message(buffer, plaintext)) {
+            if (parse_command(plaintext, command, target)) {
+                if (strcmp(command, "launch") == 0) {
+                    char log[512];
+                    snprintf(log, sizeof(log), "Launch command verified, target: %s", target);
+                    log_event(log);
+                    // Simulate launch
                 }
-                
-                if (verify_message(&msg, submarine_key)) {
-                    decrypt_message(&msg, submarine_key);
-                    
-                    switch(msg.type) {
-                        case MSG_LAUNCH_ORDER:
-                            if (launch_capability && !stealth_mode) {
-                                launch_missile(msg.payload);
-                                
-                                // Send confirmation
-                                SecureMessage response;
-                                response.type = MSG_LAUNCH_CONFIRM;
-                                strcpy(response.sender, "SUBMARINE");
-                                strcpy(response.payload, "Underwater launch completed");
-                                encrypt_message(&response, submarine_key);
-                                send(sock, &response, sizeof(response), 0);
-                            } else {
-                                log_message("Launch order received but capability offline or in stealth");
-                            }
-                            break;
-                            
-                        case MSG_STATUS:
-                            log_message(msg.payload);
-                            break;
-                            
-                        default:
-                            log_message("Received unknown message type");
-                            break;
-                    }
-                } else {
-                    log_message("Message verification failed - possible security breach!");
-                }
+            } else {
+                log_event("Invalid command format");
             }
+        } else {
+            log_event("Invalid message received");
         }
-        
-        sleep(5); // Prevent busy waiting
     }
-    
+
     close(sock);
-    cleanup_crypto();
     return 0;
 }
 

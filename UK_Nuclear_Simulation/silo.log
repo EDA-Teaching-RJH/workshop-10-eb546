@@ -1,6 +1,0 @@
-[Mon Apr 14 12:21:19 2025] CONNECTION   Connected to Nuclear Control
-[Mon Apr 14 12:21:25 2025] MESSAGE      Encrypted message: frppdqg:odxqfk|wdujhw:Dufwlf Rfhdq
-[Mon Apr 14 12:21:25 2025] MESSAGE      Decrypted message: command:launch|target:Arctic Ocean
-[Mon Apr 14 12:21:25 2025] COMMAND      Launch command received, Target: 
-[Mon Apr 14 12:21:35 2025] CONNECTION   Disconnected from Control
-[Mon Apr 14 12:21:35 2025] SHUTDOWN     Missile Silo terminated after 30s simulation

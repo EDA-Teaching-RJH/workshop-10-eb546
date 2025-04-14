@@ -1,7 +1,8 @@
 {
     "files.associations": {
         "in.h": "c",
-        "aes.h": "c"
+        "aes.h": "c",
+        "socket.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

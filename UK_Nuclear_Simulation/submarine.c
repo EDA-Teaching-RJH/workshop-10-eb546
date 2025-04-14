@@ -6,12 +6,14 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <time.h>
+#include <ctype.h>
 
 #define SERVER_IP "127.0.0.1"
 #define SERVER_PORT 8082
 #define LOG_FILE "submarine.log"
+#define CAESAR_SHIFT 3
 
-void log_event(const char *event) {
+void log_event(const char *event_type, const char *details) {
     FILE *fp = fopen(LOG_FILE, "a");
     if (fp == NULL) {
         perror("Log file open failed");
@@ -21,39 +23,53 @@ void log_event(const char *event) {
     char *time_str = ctime(&now);
     if (time_str) {
         time_str[strlen(time_str) - 1] = '\0';
-        fprintf(fp, "[%s] %s\n", time_str, event);
+        fprintf(fp, "[%s] %-12s %s\n", time_str, event_type, details);
     }
     fclose(fp);
 }
 
-void encrypt_message(const char *plaintext, char *ciphertext, size_t len) {
-    snprintf(ciphertext, len, "ENCRYPTED:%s", plaintext);
+void caesar_encrypt(const char *plaintext, char *ciphertext, size_t len) {
+    memset(ciphertext, 0, len);
+    for (size_t i = 0; i < strlen(plaintext) && i < len - 1; i++) {
+        if (isalpha((unsigned char)plaintext[i])) {
+            char base = isupper((unsigned char)plaintext[i]) ? 'A' : 'a';
+            ciphertext[i] = (char)((plaintext[i] - base + CAESAR_SHIFT) % 26 + base);
+        } else {
+            ciphertext[i] = plaintext[i];
+        }
+    }
 }
 
-int verify_message(const char *ciphertext, char *plaintext, size_t len) {
-    if (strncmp(ciphertext, "ENCRYPTED:", 10) == 0) {
-        strncpy(plaintext, ciphertext + 10, len - 1);
-        plaintext[len - 1] = '\0';
-        return 1;
+void caesar_decrypt(const char *ciphertext, char *plaintext, size_t len) {
+    memset(plaintext, 0, len);
+    for (size_t i = 0; i < strlen(ciphertext) && i < len - 1; i++) {
+        if (isalpha((unsigned char)ciphertext[i])) {
+            char base = isupper((unsigned char)ciphertext[i]) ? 'A' : 'a';
+            plaintext[i] = (char)((ciphertext[i] - base - CAESAR_SHIFT + 26) % 26 + base);
+        } else {
+            plaintext[i] = ciphertext[i];
+        }
     }
-    return 0;
 }
 
 int parse_command(const char *message, char *command, char *target) {
     char *copy = strdup(message);
     if (!copy) {
+        log_event("ERROR", "Memory allocation failed for parsing");
         return 0;
     }
 
     command[0] = '\0';
     target[0] = '\0';
+    int valid = 1;
     char *token = strtok(copy, "|");
-    while (token) {
+    while (token && valid) {
         char *key = strtok(token, ":");
         char *value = strtok(NULL, ":");
         if (!key || !value) {
-            free(copy);
-            return 0;
+            log_event("ERROR", "Malformed command key-value pair");
+            valid = 0;
+            break;
         }
         if (strcmp(key, "command") == 0) {
             strncpy(command, value, 19);
@@ -65,7 +81,11 @@ int parse_command(const char *message, char *command, char *target) {
         token = strtok(NULL, "|");
     }
     free(copy);
-    return command[0] != '\0';
+    if (!valid || !command[0]) {
+        log_event("ERROR", "Invalid or incomplete command");
+        return 0;
+    }
+    return 1;
 }
 
 void send_intel(int sock) {
@@ -73,13 +93,19 @@ void send_intel(int sock) {
     snprintf(message, sizeof(message),
              "source:Submarine|data:Enemy sub detected|threat_level:0.6|location:Atlantic");
     char ciphertext[1024];
-    encrypt_message(message, ciphertext, sizeof(ciphertext));
+    caesar_encrypt(message, ciphertext, sizeof(ciphertext));
+
+    char log_msg[1024];
+    snprintf(log_msg, sizeof(log_msg), "Sending encrypted: %s", ciphertext);
+    log_event("MESSAGE", log_msg);
+    snprintf(log_msg, sizeof(log_msg), "Original message: %s", message);
+    log_event("MESSAGE", log_msg);
 
     if (send(sock, ciphertext, strlen(ciphertext), 0) < 0) {
-        log_event("Failed to send intelligence");
+        log_event("ERROR", "Failed to send intelligence");
         return;
     }
-    log_event("Intelligence sent");
+    log_event("INTEL", "Intelligence sent: Enemy sub detected, Threat Level: 0.6, Location: Atlantic");
 }
 
 int main(void) {
@@ -104,7 +130,7 @@ int main(void) {
         return 1;
     }
 
-    log_event("Submarine connected to Control");
+    log_event("CONNECTION", "Connected to Nuclear Control");
 
     send_intel(sock);
 
@@ -116,27 +142,32 @@ int main(void) {
     while (1) {
         ssize_t bytes = recv(sock, buffer, sizeof(buffer) - 1, 0);
         if (bytes <= 0) {
-            log_event("Connection lost");
+            log_event("CONNECTION", "Disconnected from Control");
             break;
         }
         buffer[bytes] = '\0';
 
-        if (verify_message(buffer, plaintext, sizeof(plaintext))) {
-            if (parse_command(plaintext, command, target)) {
-                if (strcmp(command, "launch") == 0) {
-                    char log[512];
-                    snprintf(log, sizeof(log), "Launch command verified, target: %s", target);
-                    log_event(log);
-                }
+        char log_msg[1024];
+        snprintf(log_msg, sizeof(log_msg), "Received encrypted: %s", buffer);
+        log_event("MESSAGE", log_msg);
+
+        caesar_decrypt(buffer, plaintext, sizeof(plaintext));
+        snprintf(log_msg, sizeof(log_msg), "Decrypted to: %s", plaintext);
+        log_event("MESSAGE", log_msg);
+
+        if (parse_command(plaintext, command, target)) {
+            if (strcmp(command, "launch") == 0) {
+                snprintf(log_msg, sizeof(log_msg), "Launch command verified, Target: %s", target);
+                log_event("COMMAND", log_msg);
             } else {
-                log_event("Invalid command format");
+                snprintf(log_msg, sizeof(log_msg), "Unknown command: %s", command);
+                log_event("ERROR", log_msg);
             }
-        } else {
-            log_event("Invalid message received");
         }
     }
 
     close(sock);
+    log_event("SHUTDOWN", "Submarine terminated");
     return 0;
 }
 

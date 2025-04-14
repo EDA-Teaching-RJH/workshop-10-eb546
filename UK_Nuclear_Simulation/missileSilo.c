@@ -6,12 +6,14 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <time.h>
+#include <ctype.h>
 
 #define SERVER_IP "127.0.0.1"
 #define SERVER_PORT 8081
 #define LOG_FILE "silo.log"
+#define CAESAR_SHIFT 3
 
-void log_event(const char *event) {
+void log_event(const char *event_type, const char *details) {
     FILE *fp = fopen(LOG_FILE, "a");
     if (fp == NULL) {
         perror("Log file open failed");
@@ -21,35 +23,41 @@ void log_event(const char *event) {
     char *time_str = ctime(&now);
     if (time_str) {
         time_str[strlen(time_str) - 1] = '\0';
-        fprintf(fp, "[%s] %s\n", time_str, event);
+        fprintf(fp, "[%s] %-12s %s\n", time_str, event_type, details);
     }
     fclose(fp);
 }
 
-int verify_message(const char *ciphertext, char *plaintext, size_t len) {
-    if (strncmp(ciphertext, "ENCRYPTED:", 10) == 0) {
-        strncpy(plaintext, ciphertext + 10, len - 1);
-        plaintext[len - 1] = '\0';
-        return 1;
+void caesar_decrypt(const char * cipherText, char * plaintext, size_t len) {
+    memset(plaintext, 0, len);
+    for (size_t i = 0; i < strlen(cipherText) && i < len - 1; i++) {
+        if (isalpha((unsigned char)cipherText[i])) {
+            char base = isupper((unsigned char)cipherText[i]) ? 'A' : 'a';
+            plaintext[i] = (char)((cipherText[i] - base - CAESAR_SHIFT + 26) % 26 + base);
+        } else {
+            plaintext[i] = cipherText[i];
+        }
     }
-    return 0;
 }
 
 int parse_command(const char *message, char *command, char *target) {
     char *copy = strdup(message);
     if (!copy) {
+        log_event("ERROR", "Memory allocation failed for parsing");
         return 0;
     }
 
     command[0] = '\0';
     target[0] = '\0';
+    int valid = 1;
     char *token = strtok(copy, "|");
-    while (token) {
+    while (token && valid) {
         char *key = strtok(token, ":");
         char *value = strtok(NULL, ":");
         if (!key || !value) {
-            free(copy);
-            return 0;
+            log_event("ERROR", "Malformed command key-value pair");
+            valid = 0;
+            break;
         }
         if (strcmp(key, "command") == 0) {
             strncpy(command, value, 19);
@@ -61,7 +69,11 @@ int parse_command(const char *message, char *command, char *target) {
         token = strtok(NULL, "|");
     }
     free(copy);
-    return command[0] != '\0';
+    if (!valid || !command[0]) {
+        log_event("ERROR", "Invalid or incomplete command");
+        return 0;
+    }
+    return 1;
 }
 
 int main(void) {
@@ -86,7 +98,7 @@ int main(void) {
         return 1;
     }
 
-    log_event("Missile Silo connected to Control");
+    log_event("CONNECTION", "Connected to Nuclear Control");
 
     char buffer[1024];
     char plaintext[1024];
@@ -96,27 +108,32 @@ int main(void) {
     while (1) {
         ssize_t bytes = recv(sock, buffer, sizeof(buffer) - 1, 0);
         if (bytes <= 0) {
-            log_event("Connection lost");
+            log_event("CONNECTION", "Disconnected from Control");
             break;
         }
         buffer[bytes] = '\0';
 
-        if (verify_message(buffer, plaintext, sizeof(plaintext))) {
-            if (parse_command(plaintext, command, target)) {
-                if (strcmp(command, "launch") == 0) {
-                    char log[512];
-                    snprintf(log, sizeof(log), "Launch command verified, target: %s", target);
-                    log_event(log);
-                }
+        char log_msg[1024];
+        snprintf(log_msg, sizeof(log_msg), "Received encrypted: %s", buffer);
+        log_event("MESSAGE", log_msg);
+
+        caesar_decrypt(buffer, plaintext, sizeof(plaintext));
+        snprintf(log_msg, sizeof(log_msg), "Decrypted to: %s", plaintext);
+        log_event("MESSAGE", log_msg);
+
+        if (parse_command(plaintext, command, target)) {
+            if (strcmp(command, "launch") == 0) {
+                snprintf(log_msg, sizeof(log_msg), "Launch command verified, Target: %s", target);
+                log_event("COMMAND", log_msg);
             } else {
-                log_event("Invalid command format");
+                snprintf(log_msg, sizeof(log_msg), "Unknown command: %s", command);
+                log_event("ERROR", log_msg);
             }
-        } else {
-            log_event("Invalid message received");
         }
     }
 
     close(sock);
+    log_event("SHUTDOWN", "Missile Silo terminated");
     return 0;
 }
 
